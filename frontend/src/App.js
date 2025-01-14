@@ -1,6 +1,10 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import LoginPage from './components/LoginPage';
+import Dashboard from './components/dashboard/Dashboard';
+import ActivityList from './components/activities/ActivityList';
+import ScheduleCalendar from './components/schedule/ScheduleCalendar';
+import EvaluationForm from './components/evaluation/EvaluationForm';
 
 // Protected Route wrapper component
 const ProtectedRoute = ({ children }) => {
@@ -10,22 +14,26 @@ const ProtectedRoute = ({ children }) => {
 
 // Layout component for the dashboard
 const DashboardLayout = ({ children }) => {
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    window.location.href = '/login';
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <nav className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
-            <div className="flex">
-              <div className="flex-shrink-0 flex items-center">
-                <h1 className="text-xl font-bold text-gray-800">Wellness Management</h1>
-              </div>
+            <div className="flex space-x-4 items-center">
+              <h1 className="text-xl font-bold text-gray-800">Wellness Management</h1>
+              <Link to="/" className="text-gray-600 hover:text-gray-900">Dashboard</Link>
+              <Link to="/activities" className="text-gray-600 hover:text-gray-900">Activities</Link>
+              <Link to="/schedule" className="text-gray-600 hover:text-gray-900">Schedule</Link>
+              <Link to="/evaluation" className="text-gray-600 hover:text-gray-900">Evaluation</Link>
             </div>
             <div className="flex items-center">
               <button
-                onClick={() => {
-                  localStorage.removeItem('token');
-                  window.location.href = '/login';
-                }}
+                onClick={handleLogout}
                 className="ml-4 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
               >
                 Logout
@@ -41,14 +49,6 @@ const DashboardLayout = ({ children }) => {
   );
 };
 
-// Dashboard component
-const Dashboard = () => (
-  <div className="bg-white shadow rounded-lg p-6">
-    <h2 className="text-2xl font-bold mb-4">Welcome to Wellness Management System</h2>
-    <p className="text-gray-600">Select an option from the menu to get started.</p>
-  </div>
-);
-
 export default function App() {
   return (
     <Router>
@@ -60,6 +60,36 @@ export default function App() {
             <ProtectedRoute>
               <DashboardLayout>
                 <Dashboard />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/activities"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <ActivityList />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/schedule"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <ScheduleCalendar />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/evaluation"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <EvaluationForm />
               </DashboardLayout>
             </ProtectedRoute>
           }
