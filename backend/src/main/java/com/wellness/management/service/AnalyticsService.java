@@ -1,5 +1,6 @@
 package com.wellness.management.service;
 
+import com.wellness.management.model.UserRole;
 import com.wellness.management.repository.ActivityRepository;
 import com.wellness.management.repository.EvaluationRepository;
 import com.wellness.management.repository.ScheduleRepository;
