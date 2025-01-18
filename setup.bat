@@ -32,7 +32,19 @@ REM Setup Frontend
 echo Setting up frontend...
 cd ../frontend
 echo Installing frontend dependencies...
-call npm install
+
+REM Clean npm cache and remove existing node_modules
+echo Cleaning npm cache...
+call npm cache clean --force
+
+if exist node_modules (
+    echo Removing existing node_modules...
+    rmdir /s /q node_modules
+)
+
+REM Install dependencies
+echo Installing dependencies...
+call npm install --legacy-peer-deps
 
 REM Create .env file
 echo Creating frontend environment configuration...
