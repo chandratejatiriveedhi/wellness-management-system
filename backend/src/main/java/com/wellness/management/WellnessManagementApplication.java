@@ -6,8 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class WellnessManagementApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(WellnessManagementApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(WellnessManagementApplication.class, args);
+    }
 }
