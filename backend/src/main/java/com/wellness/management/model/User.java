@@ -20,4 +20,10 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
+
+    @Column
+    private String email;
+
+    @Column
+    private String location;
 }
