@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 export default function ForgotPassword() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
@@ -11,9 +11,9 @@ export default function ForgotPassword() {
     e.preventDefault();
     try {
       await axios.post('http://localhost:8080/api/auth/forgot-password', {
-        email
+        username
       });
-      setMessage('Password reset instructions have been sent to your email');
+      setMessage('Password reset instructions have been sent');
       setError('');
     } catch (err) {
       setError('Error processing your request. Please try again.');
@@ -29,24 +29,24 @@ export default function ForgotPassword() {
             Reset your password
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Enter your email address and we'll send you instructions to reset your password
+            Enter your username and we'll send you instructions to reset your password
           </p>
         </div>
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="email" className="sr-only">
-              Email address
+            <label htmlFor="username" className="sr-only">
+              Username
             </label>
             <input
-              id="email"
-              name="email"
-              type="email"
+              id="username"
+              name="username"
+              type="text"
               required
               className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-              placeholder="Email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
             />
           </div>
 
