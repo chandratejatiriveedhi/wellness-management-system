@@ -7,8 +7,12 @@ export default function Navbar() {
   let userRole = null;
 
   if (token) {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    userRole = payload.role;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      userRole = payload.role;
+    } catch (error) {
+      console.error('Error parsing token:', error);
+    }
   }
 
   const handleLogout = () => {
@@ -16,36 +20,68 @@ export default function Navbar() {
     navigate('/login');
   };
 
+  // Navigation items based on role
+  const navigationItems = [
+    {
+      name: 'User Maintenance',
+      path: '/users',
+      allowedRoles: ['ADMIN', 'CLIENT', 'TEACHER'],
+      className: 'bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium'
+    }
+  ];
+
+  const authorizedNavItems = navigationItems.filter(item => 
+    item.allowedRoles.includes(userRole)
+  );
+
   return (
     <nav className="bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          <div className="flex">
-            <div className="flex-shrink-0 flex items-center">
-              <h1 className="text-xl font-bold text-gray-800">
-                <Link to="/">Wellness Management</Link>
-              </h1>
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <Link to="/" className="text-xl font-bold text-gray-800">
+                Wellness Management
+              </Link>
             </div>
-            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              {/* Show User Maintenance link for ADMIN, CLIENT, and TEACHER */}
-              {(['ADMIN', 'CLIENT', 'TEACHER'].includes(userRole)) && (
+
+            {/* Navigation Links */}
+            <div className="hidden sm:ml-6 sm:flex sm:space-x-4">
+              {authorizedNavItems.map((item) => (
                 <Link
-                  to="/users"
-                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 hover:text-gray-500"
+                  key={item.path}
+                  to={item.path}
+                  className={item.className}
                 >
-                  User Maintenance
+                  {item.name}
                 </Link>
-              )}
-              {/* Add more navigation links based on roles here */}
+              ))}
             </div>
           </div>
+
+          {/* Logout Button */}
           <div className="flex items-center">
             <button
               onClick={handleLogout}
-              className="ml-4 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+              className="ml-4 px-4 py-2 text-sm text-red-600 hover:text-red-900 hover:bg-red-50 rounded-md font-medium"
             >
               Logout
             </button>
+          </div>
+        </div>
+
+        {/* Mobile Navigation */}
+        <div className="sm:hidden">
+          <div className="pt-2 pb-3 space-y-1">
+            {authorizedNavItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`block ${item.className}`}
+              >
+                {item.name}
+              </Link>
+            ))}
           </div>
         </div>
       </div>
