@@ -3,11 +3,29 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import LoginPage from './components/LoginPage';
 import ForgotPassword from './components/ForgotPassword';
 import Navbar from './components/Navbar';
+import UserMaintenance from './components/UserMaintenance';
 
 // Protected Route wrapper component
-const ProtectedRoute = ({ children }) => {
-  const isAuthenticated = localStorage.getItem('token');
-  return isAuthenticated ? children : <Navigate to="/login" />;
+const ProtectedRoute = ({ children, allowedRoles = [] }) => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    return <Navigate to="/login" />;
+  }
+
+  // If no specific roles are required, allow access
+  if (allowedRoles.length === 0) {
+    return children;
+  }
+
+  // Decode token to get user role
+  const payload = JSON.parse(atob(token.split('.')[1]));
+  const userRole = payload.role;
+
+  if (!allowedRoles.includes(userRole)) {
+    return <Navigate to="/" />;
+  }
+
+  return children;
 };
 
 // Layout component for the dashboard
@@ -36,16 +54,22 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <Dashboard />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
+        
+        <Route path="/" element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <Dashboard />
+            </DashboardLayout>
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/users" element={
+          <ProtectedRoute allowedRoles={['ADMIN', 'CLIENT', 'TEACHER']}>
+            <DashboardLayout>
+              <UserMaintenance />
+            </DashboardLayout>
+          </ProtectedRoute>
+        } />
       </Routes>
     </Router>
   );
