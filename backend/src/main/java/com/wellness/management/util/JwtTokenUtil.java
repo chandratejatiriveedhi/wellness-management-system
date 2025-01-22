@@ -1,5 +1,6 @@
 package com.wellness.management.util;
 
+import com.wellness.management.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -45,6 +46,10 @@ public class JwtTokenUtil {
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
+        // Add user role if using your custom User class
+        if (userDetails instanceof User) {
+            claims.put("role", ((User) userDetails).getRole().name());
+        }
         return doGenerateToken(claims, userDetails.getUsername());
     }
 
@@ -61,5 +66,11 @@ public class JwtTokenUtil {
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+    
+    // Add method to get role from token
+    public String getRoleFromToken(String token) {
+        Claims claims = getAllClaimsFromToken(token);
+        return claims.get("role", String.class);
     }
 }
