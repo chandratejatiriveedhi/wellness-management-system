@@ -29,6 +29,16 @@ public class DataLoader implements CommandLineRunner {
             userRepository.save(admin);
         }
 
+        // Create default client user if not exists
+        if (userRepository.findByUsername("client").isEmpty()) {
+            User client = new User();
+            client.setUsername("client");
+            client.setPassword(passwordEncoder.encode("client123"));
+            client.setRole(UserRole.CLIENT);
+            client.setEmail("client@wellness.com");
+            userRepository.save(client);
+        }
+
         // Create default teacher user if not exists
         if (userRepository.findByUsername("teacher").isEmpty()) {
             User teacher = new User();
