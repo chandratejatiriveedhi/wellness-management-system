@@ -17,13 +17,17 @@ public class User {
     @Column(nullable = false)
     private String password;
     
+    @Column(nullable = false)
+    private String email;
+    
+    @Column(nullable = true)
+    private String location;
+    
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
-
-    @Column
-    private String email;
-
-    @Column
-    private String location;
+    
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 }
