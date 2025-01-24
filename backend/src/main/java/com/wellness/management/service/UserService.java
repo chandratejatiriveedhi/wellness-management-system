@@ -18,44 +18,54 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public List<User> getFilteredUsers(String username, String profile, String location) {
+    public List<User> searchUsers(String username, String profile, String location) {
         List<User> users = userRepository.findAll();
         
         return users.stream()
-            .filter(user -> username == null || user.getUsername().toLowerCase().contains(username.toLowerCase()))
-            .filter(user -> profile == null || user.getRole().name().equals(profile))
+            .filter(user -> username == null || 
+                          user.getUsername().toLowerCase().contains(username.toLowerCase()))
+            .filter(user -> profile == null || 
+                          user.getRole().name().equals(profile))
             .filter(user -> location == null || 
-                    (user.getLocation() != null && 
-                     user.getLocation().toLowerCase().contains(location.toLowerCase())))
+                          (user.getLocation() != null && 
+                           user.getLocation().toLowerCase().contains(location.toLowerCase())))
             .collect(Collectors.toList());
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
     public User getUserById(Long id) {
         return userRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
     }
 
     public User createUser(User user) {
+        // Check if username is already taken
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             throw new RuntimeException("Username already exists");
         }
+        
+        // Encode password before saving
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
     public User updateUser(Long id, User userDetails) {
         User user = getUserById(id);
-        
-        // Don't update username as it's the unique identifier
+
+        // Update fields
         user.setEmail(userDetails.getEmail());
-        user.setRole(userDetails.getRole());
         user.setLocation(userDetails.getLocation());
-        
-        // Only update password if it's provided in the request
+        user.setRole(userDetails.getRole());
+        user.setCustomer(userDetails.getCustomer());
+
+        // Only update password if it's provided
         if (userDetails.getPassword() != null && !userDetails.getPassword().isEmpty()) {
             user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
         }
-        
+
         return userRepository.save(user);
     }
 
