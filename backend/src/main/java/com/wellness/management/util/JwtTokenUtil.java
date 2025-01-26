@@ -46,10 +46,12 @@ public class JwtTokenUtil {
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        // Add user role if using your custom User class
-        if (userDetails instanceof User) {
-            claims.put("role", ((User) userDetails).getRole().name());
-        }
+        // Extract the first authority (role) and add it to claims
+        String role = userDetails.getAuthorities().stream()
+                        .findFirst()
+                        .map(authority -> authority.getAuthority())
+                        .orElse("ROLE_USER"); // Default role if none found
+        claims.put("role", role);
         return doGenerateToken(claims, userDetails.getUsername());
     }
 
@@ -67,7 +69,7 @@ public class JwtTokenUtil {
         final String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
-    
+
     // Add method to get role from token
     public String getRoleFromToken(String token) {
         Claims claims = getAllClaimsFromToken(token);

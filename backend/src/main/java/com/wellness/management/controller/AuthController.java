@@ -4,6 +4,8 @@ import com.wellness.management.model.JwtRequest;
 import com.wellness.management.model.JwtResponse;
 import com.wellness.management.service.JwtUserDetailsService;
 import com.wellness.management.util.JwtTokenUtil;
+
+//import org.hibernate.annotations.common.util.impl.Log_.logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,7 +21,6 @@ import java.util.HashMap;
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "*")
 public class AuthController {
-
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -43,6 +44,7 @@ public class AuthController {
         }
 
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+        System.out.println("User details: " + userDetails);
         final String token = jwtTokenUtil.generateToken(userDetails);
 
         return ResponseEntity.ok(new JwtResponse(token));

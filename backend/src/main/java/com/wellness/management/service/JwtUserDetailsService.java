@@ -2,6 +2,7 @@ package com.wellness.management.service;
 
 import com.wellness.management.model.User;
 import com.wellness.management.repository.UserRepository;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -9,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -27,10 +29,15 @@ public class JwtUserDetailsService implements UserDetailsService {
         User user = userRepository.findByUsername(username)
             .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 
+        // Create authorities list with user's role
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+    
+        authorities.add(new SimpleGrantedAuthority(user.getRole().toString())); // Add user's role as authority
+        
         return new org.springframework.security.core.userdetails.User(
             user.getUsername(),
             user.getPassword(),
-            new ArrayList<>()
+            authorities // Pass the authorities list instead of empty ArrayList
         );
     }
 
