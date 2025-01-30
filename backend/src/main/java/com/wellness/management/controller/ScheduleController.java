@@ -20,7 +20,7 @@ public class ScheduleController {
     private ScheduleService scheduleService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
     public ResponseEntity<Schedule> createSchedule(@RequestBody Schedule schedule) {
         return ResponseEntity.ok(scheduleService.createSchedule(schedule));
     }
@@ -43,7 +43,7 @@ public class ScheduleController {
     }
 
     @PutMapping("/{id}/attendance")
-    @PreAuthorize("hasAnyRole('ADMIN', 'TEACHER')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'TEACHER')")
     public ResponseEntity<Schedule> updateAttendance(
             @PathVariable Long id,
             @RequestParam boolean attended) {
