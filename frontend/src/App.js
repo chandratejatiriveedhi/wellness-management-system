@@ -5,6 +5,9 @@ import ForgotPassword from './components/ForgotPassword';
 import Navbar from './components/Navbar';
 import UserMaintenance from './components/UserMaintenance';
 import CustomerMaintenancePage from './components/CustomerMaintenancePage';
+import ActivityMaintenancePage from './components/activities/ActivityMaintenancePage';
+import MaintenanceControlPage from './components/maintenance/MaintenanceControlPage';
+import EvaluationControlPage from './components/evaluation/EvaluationControlPage';
 
 // Protected Route wrapper component
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
@@ -75,6 +78,27 @@ export default function App() {
           <ProtectedRoute allowedRoles={['ADMIN']}>
             <DashboardLayout>
               <CustomerMaintenancePage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        } />
+         <Route path="/activities" element={
+          <ProtectedRoute allowedRoles={['ADMIN']}>
+            <DashboardLayout>
+              <ActivityMaintenancePage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        } />
+         <Route path="/maintenance" element={
+          <ProtectedRoute allowedRoles={['ADMIN', 'CLIENT', 'TEACHER','STUDENT']}>
+            <DashboardLayout>
+              <MaintenanceControlPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/evaluation" element={
+          <ProtectedRoute allowedRoles={['ADMIN', 'CLIENT', 'TEACHER','STUDENT']}>
+            <DashboardLayout>
+              <EvaluationControlPage />
             </DashboardLayout>
           </ProtectedRoute>
         } />

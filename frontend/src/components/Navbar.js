@@ -35,6 +35,24 @@ export default function Navbar() {
       path: '/customer',
       allowedRoles: ['ADMIN'],
       className: 'bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium'
+    },
+    {
+      name: 'Activity Maintenance',
+      path: '/activities',
+      allowedRoles: ['ADMIN'],
+      className: 'bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium'
+    },
+    {
+      name: 'Maintenance/schedule Control',
+      path: '/maintenance',
+      allowedRoles: ['ADMIN', 'CLIENT', 'TEACHER','STUDENT'],
+      className: 'bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium'
+    },
+    {
+      name: 'Evaluation Control',
+      path: '/evaluation',
+      allowedRoles: ['ADMIN', 'CLIENT', 'TEACHER','STUDENT'],
+      className: 'bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium'
     }
   ];
 
