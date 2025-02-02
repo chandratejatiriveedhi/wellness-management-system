@@ -5,7 +5,7 @@ import ForgotPassword from './components/ForgotPassword';
 import Navbar from './components/Navbar';
 import UserMaintenance from './components/UserMaintenance';
 import CustomerMaintenancePage from './components/CustomerMaintenancePage';
-import ActivityMaintenancePage from './components/activities/ActivityMaintenancePage';
+import ActivityMaintenancePage from './components/ActivityMaintenancePage';
 import MaintenanceControlPage from './components/maintenance/MaintenanceControlPage';
 import EvaluationControlPage from './components/evaluation/EvaluationControlPage';
 

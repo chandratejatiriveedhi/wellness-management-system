@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import ActivityForm from './maintenance/ActivityForm';
+import ActivityForm from './activities/ActivityForm';
 
 const ActivityMaintenancePage = () => {
   const [activities, setActivities] = useState([]);
