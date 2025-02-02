@@ -9,6 +9,7 @@ import java.util.List;
 
 @Service
 public class ActivityService {
+
     @Autowired
     private ActivityRepository activityRepository;
     
@@ -37,5 +38,21 @@ public class ActivityService {
     public void deleteActivity(Long id) {
         Activity activity = getActivityById(id);
         activityRepository.delete(activity);
+    }
+
+    // ✅ Search activities based on name, type, and faceToFace
+    public List<Activity> searchActivity(String name, String type, Boolean faceToFace) {
+        if (name != null && type != null && faceToFace != null) {
+            return activityRepository.findByNameContainingAndTypeAndFaceToFace(name, type, faceToFace);
+        } else if (name != null && type != null) {
+            return activityRepository.findByNameContainingAndType(name, type);
+        } else if (name != null) {
+            return activityRepository.findByNameContaining(name);
+        } else if (type != null) {
+            return activityRepository.findByType(type);
+        } else if (faceToFace != null) {
+            return activityRepository.findByFaceToFace(faceToFace);
+        }
+        return activityRepository.findAll();
     }
 }
