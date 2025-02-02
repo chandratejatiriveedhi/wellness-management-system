@@ -1,55 +1,58 @@
 import React, { useState, useEffect } from 'react';
+import ActivityForm from './ActivityForm';
 
 const ActivityMaintenancePage = () => {
   const [activities, setActivities] = useState([]);
-  const [mode, setMode] = useState('list');
+  const [showForm, setShowForm] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [searchFilters, setSearchFilters] = useState({
     activity: '',
     inPerson: ''
   });
-  const [formData, setFormData] = useState({
-    name: '',
-    inPerson: false
-  });
 
+  // Fetch activities from backend
   useEffect(() => {
+    console.log('ActivityMaintenancePage - Component mounted');
     fetchActivities();
   }, []);
 
   const fetchActivities = async () => {
+    console.log('ActivityMaintenancePage - Fetching activities');
     try {
       const response = await fetch('/api/activities', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
+      console.log('ActivityMaintenancePage - Fetch response status:', response.status);
+      
       if (response.ok) {
         const data = await response.json();
+        console.log('ActivityMaintenancePage - Fetched activities:', data);
         setActivities(data);
+      } else {
+        const errorText = await response.text();
+        console.error('Error fetching activities:', errorText);
       }
     } catch (error) {
       console.error('Error fetching activities:', error);
     }
   };
 
-  const handleModeChange = (newMode, activity = null) => {
-    setMode(newMode);
+  const handleAdd = () => {
+    console.log('ActivityMaintenancePage - Opening add form');
+    setSelectedActivity(null);
+    setShowForm(true);
+  };
+
+  const handleEdit = (activity) => {
+    console.log('ActivityMaintenancePage - Opening edit form for activity:', activity);
     setSelectedActivity(activity);
-    if (activity) {
-      setFormData({
-        name: activity.name,
-        inPerson: activity.inPerson
-      });
-    } else {
-      setFormData({
-        name: '',
-        inPerson: false
-      });
-    }
+    setShowForm(true);
   };
 
   const handleDelete = async (activityId) => {
+    console.log('ActivityMaintenancePage - Attempting to delete activity:', activityId);
     if (window.confirm('Are you sure you want to delete this activity?')) {
       try {
         const response = await fetch(`/api/activities/${activityId}`, {
@@ -58,8 +61,14 @@ const ActivityMaintenancePage = () => {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
+        console.log('ActivityMaintenancePage - Delete response status:', response.status);
+        
         if (response.ok) {
+          console.log('ActivityMaintenancePage - Activity deleted successfully');
           fetchActivities();
+        } else {
+          const errorText = await response.text();
+          console.error('Error deleting activity:', errorText);
         }
       } catch (error) {
         console.error('Error deleting activity:', error);
@@ -67,13 +76,15 @@ const ActivityMaintenancePage = () => {
     }
   };
 
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
+  const handleFormSubmit = async (formData) => {
+    console.log('ActivityMaintenancePage - Form submitted with data:', formData);
     try {
-      const url = mode === 'change' 
+      const url = selectedActivity 
         ? `/api/activities/${selectedActivity.id}`
         : '/api/activities';
-      const method = mode === 'change' ? 'PUT' : 'POST';
+      const method = selectedActivity ? 'PUT' : 'POST';
+      
+      console.log(`ActivityMaintenancePage - Making ${method} request to:`, url);
 
       const response = await fetch(url, {
         method: method,
@@ -84,131 +95,83 @@ const ActivityMaintenancePage = () => {
         body: JSON.stringify(formData)
       });
 
-      if (response.ok) {
-        setMode('list');
-        fetchActivities();
+      console.log('ActivityMaintenancePage - Response status:', response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        return;
       }
+
+      const savedActivity = await response.json();
+      console.log('ActivityMaintenancePage - Saved activity:', savedActivity);
+
+      setShowForm(false);
+      fetchActivities();
     } catch (error) {
       console.error('Error saving activity:', error);
     }
   };
 
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-  };
-
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
+    console.log(`ActivityMaintenancePage - Filter changed: ${name} = ${value}`);
     setSearchFilters(prev => ({
       ...prev,
       [name]: value
     }));
   };
 
-  const renderSearchFilters = () => (
-    <div className="bg-white p-4 rounded shadow mb-6">
-      <h2 className="text-lg font-semibold mb-4">Search Filters</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Activity Name</label>
-          <input
-            type="text"
-            name="activity"
-            value={searchFilters.activity}
-            onChange={handleFilterChange}
-            className="mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">In-Person</label>
-          <select
-            name="inPerson"
-            value={searchFilters.inPerson}
-            onChange={handleFilterChange}
-            className="mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
-            <option value="">All</option>
-            <option value="true">Yes</option>
-            <option value="false">No</option>
-          </select>
+  const filteredActivities = activities.filter(activity => {
+    const matchesName = activity.name.toLowerCase().includes(searchFilters.activity.toLowerCase());
+    const matchesInPerson = searchFilters.inPerson === '' || 
+      activity.inPerson === (searchFilters.inPerson === 'true');
+    return matchesName && matchesInPerson;
+  });
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Activity Maintenance</h1>
+        <button
+          onClick={handleAdd}
+          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          Add Activity
+        </button>
+      </div>
+
+      {/* Search Filters */}
+      <div className="bg-white p-4 rounded shadow mb-6">
+        <h2 className="text-lg font-semibold mb-4">Search Filters</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Activity Name</label>
+            <input
+              type="text"
+              name="activity"
+              value={searchFilters.activity}
+              onChange={handleFilterChange}
+              className="mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">In-Person</label>
+            <select
+              name="inPerson"
+              value={searchFilters.inPerson}
+              onChange={handleFilterChange}
+              className="mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            >
+              <option value="">All</option>
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </div>
         </div>
       </div>
-    </div>
-  );
 
-  const renderActivityForm = () => (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-xl font-bold mb-4">
-        {mode === 'add' ? 'Add New Activity' : mode === 'change' ? 'Edit Activity' : 'View Activity'}
-      </h2>
-      
-      <form onSubmit={handleFormSubmit}>
-        <div className="mb-4">
-          <label 
-            htmlFor="name" 
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Activity Name *
-          </label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            disabled={mode === 'consult'}
-            className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 border-gray-300"
-          />
-        </div>
-
-        <div className="mb-6">
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              name="inPerson"
-              checked={formData.inPerson}
-              onChange={handleInputChange}
-              disabled={mode === 'consult'}
-              className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-            />
-            <span className="ml-2 text-sm text-gray-700">Face-to-face Activity</span>
-          </label>
-        </div>
-
-        <div className="flex justify-end space-x-4">
-          <button
-            type="button"
-            onClick={() => handleModeChange('list')}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            Back
-          </button>
-          {mode !== 'consult' && (
-            <button
-              type="submit"
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              {mode === 'add' ? 'Create' : 'Update'}
-            </button>
-          )}
-        </div>
-      </form>
-    </div>
-  );
-
-  const renderActivityList = () => {
-    const filteredActivities = activities.filter(activity => {
-      const matchesName = activity.name.toLowerCase().includes(searchFilters.activity.toLowerCase());
-      const matchesInPerson = searchFilters.inPerson === '' || 
-        activity.inPerson === (searchFilters.inPerson === 'true');
-      return matchesName && matchesInPerson;
-    });
-
-    return (
+      {/* Activities Table */}
       <div className="bg-white rounded shadow overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -231,16 +194,10 @@ const ActivityMaintenancePage = () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   {activity.inPerson ? 'Yes' : 'No'}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right space-x-2">
+                <td className="px-6 py-4 whitespace-nowrap text-right">
                   <button
-                    onClick={() => handleModeChange('consult', activity)}
-                    className="text-blue-600 hover:text-blue-900"
-                  >
-                    View
-                  </button>
-                  <button
-                    onClick={() => handleModeChange('change', activity)}
-                    className="text-indigo-600 hover:text-indigo-900"
+                    onClick={() => handleEdit(activity)}
+                    className="text-indigo-600 hover:text-indigo-900 mr-4"
                   >
                     Edit
                   </button>
@@ -256,26 +213,17 @@ const ActivityMaintenancePage = () => {
           </tbody>
         </table>
       </div>
-    );
-  };
 
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Activity Maintenance</h1>
-        {mode === 'list' && (
-          <button
-            onClick={() => handleModeChange('add')}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-          >
-            Add Activity
-          </button>
-        )}
-      </div>
-
-      {mode === 'list' && renderSearchFilters()}
-      {(mode === 'add' || mode === 'change' || mode === 'consult') && renderActivityForm()}
-      {mode === 'list' && renderActivityList()}
+      {/* Activity Form Modal */}
+      {showForm && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+          <ActivityForm
+            activity={selectedActivity}
+            onSubmit={handleFormSubmit}
+            onCancel={() => setShowForm(false)}
+          />
+        </div>
+      )}
     </div>
   );
 };
