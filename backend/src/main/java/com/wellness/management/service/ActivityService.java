@@ -29,7 +29,7 @@ public class ActivityService {
     public Activity updateActivity(Long id, Activity activityDetails) {
         Activity activity = getActivityById(id);
         activity.setName(activityDetails.getName());
-        activity.setFaceToFace(activityDetails.isFaceToFace());
+        activity.setInPerson(activityDetails.isInPerson());
         activity.setType(activityDetails.getType());
         activity.setDescription(activityDetails.getDescription());
         return activityRepository.save(activity);
@@ -40,18 +40,18 @@ public class ActivityService {
         activityRepository.delete(activity);
     }
 
-    // ✅ Search activities based on name, type, and faceToFace
-    public List<Activity> searchActivity(String name, String type, Boolean faceToFace) {
-        if (name != null && type != null && faceToFace != null) {
-            return activityRepository.findByNameContainingAndTypeAndFaceToFace(name, type, faceToFace);
+    // ✅ Search activities based on name, type, and inPerson
+    public List<Activity> searchActivity(String name, String type, Boolean inPerson) {
+        if (name != null && type != null && inPerson != null) {
+            return activityRepository.findByNameContainingAndTypeAndInPerson(name, type, inPerson);
         } else if (name != null && type != null) {
             return activityRepository.findByNameContainingAndType(name, type);
         } else if (name != null) {
             return activityRepository.findByNameContaining(name);
         } else if (type != null) {
             return activityRepository.findByType(type);
-        } else if (faceToFace != null) {
-            return activityRepository.findByFaceToFace(faceToFace);
+        } else if (inPerson != null) {
+            return activityRepository.findByInPerson(inPerson);
         }
         return activityRepository.findAll();
     }

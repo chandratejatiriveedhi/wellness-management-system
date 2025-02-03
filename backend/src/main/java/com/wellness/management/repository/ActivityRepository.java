@@ -11,7 +11,7 @@ import java.util.List;
 public interface ActivityRepository extends JpaRepository<Activity, Long> {
     List<Activity> findByNameContaining(String name);
     List<Activity> findByType(String type);  // Ensure type is stored as String or change accordingly
-    List<Activity> findByFaceToFace(Boolean faceToFace);
+    List<Activity> findByInPerson(Boolean inPerson);
     List<Activity> findByNameContainingAndType(String name, String type);
-    List<Activity> findByNameContainingAndTypeAndFaceToFace(String name, String type, Boolean faceToFace);
+    List<Activity> findByNameContainingAndTypeAndInPerson(String name, String type, Boolean inPerson);
 }

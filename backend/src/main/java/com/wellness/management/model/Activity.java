@@ -15,7 +15,7 @@ public class Activity {
     private String name;
     
     @Column(nullable = false)
-    private boolean faceToFace;
+    private boolean inPerson;
     
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

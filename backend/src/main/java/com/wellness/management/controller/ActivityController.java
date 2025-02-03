@@ -25,9 +25,9 @@ public class ActivityController {
     public ResponseEntity<List<Activity>> searchActivities(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String type,
-            @RequestParam(required = false) Boolean faceToFace) {
+            @RequestParam(required = false) Boolean inPerson) {
         // Modify the service method to handle search based on parameters
-        return ResponseEntity.ok(activityService.searchActivity(name, type, faceToFace));
+        return ResponseEntity.ok(activityService.searchActivity(name, type, inPerson));
     }
 
     // Get all activities
@@ -45,6 +45,7 @@ public class ActivityController {
     }
 
     // Create a new activity
+    //@RequestMapping(value = "/create", method = RequestMethod.POST)
     @PostMapping
     @PreAuthorize("hasAnyAuthority('ADMIN')") // Ensure that only users with the 'ADMIN' role can create activities
     public ResponseEntity<Activity> createActivity(@RequestBody Activity activity) {
