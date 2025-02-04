@@ -2,7 +2,7 @@ package com.wellness.management.model;
 
 import lombok.Data;
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 @Entity
@@ -12,20 +12,18 @@ public class Schedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @Column(nullable = false)
+    private LocalDate date;
+    
     @ManyToOne
     @JoinColumn(name = "activity_id", nullable = false)
     private Activity activity;
     
-    @ManyToOne
-    @JoinColumn(name = "teacher_id", nullable = false)
-    private User teacher;
-    
-    @ManyToOne
-    @JoinColumn(name = "student_id", nullable = false)
-    private User student;
+    @Column(nullable = false)
+    private String userId;  // ID of student/teacher/admin
     
     @Column(nullable = false)
-    private LocalDateTime scheduleDateTime;
-    
-    private boolean attended;
+    private String role;  // STUDENT, TEACHER, CLIENT, ADMIN
+
+    private String notes;
 }
