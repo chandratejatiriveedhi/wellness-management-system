@@ -19,25 +19,40 @@ const ActivityMaintenancePage = () => {
   const fetchActivities = async () => {
     console.log('ActivityMaintenancePage - Fetching activities');
     try {
-      const response = await fetch('/api/activities', {
+      const response = await fetch('http://localhost:8080/api/activities', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
+  
       console.log('ActivityMaintenancePage - Fetch response status:', response.status);
-      
-      if (response.ok) {
-        const data = await response.json();
+  
+      // Handle unauthorized access
+      if (response.status === 401 || response.status === 403) {
+        console.error('Unauthorized access - Redirecting to login');
+        alert('Session expired. Please log in again.');
+        window.location.href = '/login';  // Redirect to login page
+        return;
+      }
+  
+      // Read response as text first
+      const responseText = await response.text();
+      console.log('Raw response:', responseText);
+  
+      // Check if response is JSON
+      try {
+        const data = JSON.parse(responseText);
         console.log('ActivityMaintenancePage - Fetched activities:', data);
         setActivities(data);
-      } else {
-        const errorText = await response.text();
-        console.error('Error fetching activities:', errorText);
+      } catch (error) {
+        console.error('Error: Response is not valid JSON. Server might be returning an error page.', error);
+        console.error('Response Text:', responseText);
       }
     } catch (error) {
       console.error('Error fetching activities:', error);
     }
   };
+  
 
   const handleAdd = () => {
     console.log('ActivityMaintenancePage - Opening add form');
@@ -55,35 +70,38 @@ const ActivityMaintenancePage = () => {
     console.log('ActivityMaintenancePage - Attempting to delete activity:', activityId);
     if (window.confirm('Are you sure you want to delete this activity?')) {
       try {
-        const response = await fetch(`/api/activities/${activityId}`, {
+        const response = await fetch(`http://localhost:8080/api/activities/${activityId}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         });
+  
         console.log('ActivityMaintenancePage - Delete response status:', response.status);
-        
-        if (response.ok) {
-          console.log('ActivityMaintenancePage - Activity deleted successfully');
-          fetchActivities();
-        } else {
+  
+        if (!response.ok) {
           const errorText = await response.text();
           console.error('Error deleting activity:', errorText);
+          return;
         }
+  
+        console.log('ActivityMaintenancePage - Activity deleted successfully');
+        fetchActivities();
       } catch (error) {
         console.error('Error deleting activity:', error);
       }
     }
   };
-
+  
   const handleFormSubmit = async (formData) => {
     console.log('ActivityMaintenancePage - Form submitted with data:', formData);
     try {
-      const url = selectedActivity 
-        ? `/api/activities/${selectedActivity.id}`
-        : '/api/activities';
-      const method = selectedActivity ? 'PUT' : 'POST';
       
+      const url = selectedActivity
+      ? `http://localhost:8080/api/activities/${selectedActivity.id}`  // Update existing
+      : `http://localhost:8080/api/activities`;  // Use full backend URL
+      const method = selectedActivity ? 'PUT' : 'POST';
+
       console.log(`ActivityMaintenancePage - Making ${method} request to:`, url);
 
       const response = await fetch(url, {

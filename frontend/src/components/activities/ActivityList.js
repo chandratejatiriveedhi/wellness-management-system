@@ -33,7 +33,7 @@ export default function ActivityList() {
             <h3 className="text-lg font-semibold">{activity.name}</h3>
             <p className="text-gray-600">{activity.type}</p>
             <p className="text-sm">
-              {activity.faceToFace ? 'Face-to-face' : 'Remote'}
+              {activity.inPerson ? 'inPerson' : 'Remote'}
             </p>
             <p className="mt-2">{activity.description}</p>
           </div>

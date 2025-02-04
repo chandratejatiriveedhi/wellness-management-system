@@ -5,8 +5,8 @@ import ForgotPassword from './components/ForgotPassword';
 import Navbar from './components/Navbar';
 import UserMaintenance from './components/UserMaintenance';
 import CustomerMaintenancePage from './components/CustomerMaintenancePage';
-import ActivityMaintenancePage from './components/ActivityMaintenancePage';
-import MaintenanceControlPage from './components/maintenance/MaintenanceControlPage';
+import ActivityMaintenancePage from './components/activities/ActivityMaintenancePage';
+import MaintenanceControlPage from './components/maintenance/Schedule_controller';
 import EvaluationControlPage from './components/evaluation/EvaluationControlPage';
 
 // Protected Route wrapper component

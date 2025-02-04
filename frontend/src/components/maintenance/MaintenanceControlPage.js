@@ -33,7 +33,7 @@ const MaintenanceControlPage = () => {
 
   const fetchMaintenanceRecords = async () => {
     try {
-      const response = await fetch('/api/maintenance', {
+      const response = await fetch('http://localhost:8080/api/maintenance', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -49,7 +49,7 @@ const MaintenanceControlPage = () => {
 
   const fetchActivities = async () => {
     try {
-      const response = await fetch('/api/activities', {
+      const response = await fetch('http://localhost:8080/api/activities', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -86,7 +86,7 @@ const MaintenanceControlPage = () => {
   const handleDelete = async (recordId) => {
     if (window.confirm('Are you sure you want to delete this record?')) {
       try {
-        const response = await fetch(`/api/maintenance/${recordId}`, {
+        const response = await fetch(`http://localhost:8080/api/maintenance/${recordId}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -105,8 +105,8 @@ const MaintenanceControlPage = () => {
     e.preventDefault();
     try {
       const url = mode === 'change' 
-        ? `/api/maintenance/${selectedRecord.id}`
-        : '/api/maintenance';
+        ? `http://localhost:8080/api/maintenance/${selectedRecord.id}`
+        : 'http://localhost:8080/api/maintenance';
       const method = mode === 'change' ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
